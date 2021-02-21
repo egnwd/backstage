@@ -40,7 +40,7 @@ export interface TechDocsStorage {
 
 export interface TechDocs {
   getTechDocsMetadata(entityId: EntityName): Promise<TechDocsMetadata>;
-  getEntityMetadata(entityId: EntityName): Promise<string>;
+  getEntityMetadata(entityId: EntityName): Promise<any>;
 }
 
 /**

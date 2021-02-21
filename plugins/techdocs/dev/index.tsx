@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import React from 'react';
 import { configApiRef, discoveryApiRef } from '@backstage/core';
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { createDevApp } from '@backstage/dev-utils';
 import { techdocsPlugin } from '../src/plugin';
-import { TechDocsDevStorageApi } from './api';
-import { techdocsStorageApiRef } from '../src';
+import { TechDocsDevStorageApi, CatalogDevApi, TechDocsDevApi } from './api';
+import { techdocsStorageApiRef, techdocsApiRef, TechdocsPage } from '../src';
 
 createDevApp()
   .registerApi({
@@ -30,5 +31,27 @@ createDevApp()
         discoveryApi,
       }),
   })
+  .registerApi({
+    api: techdocsApiRef,
+    deps: { configApi: configApiRef, discoveryApi: discoveryApiRef },
+    factory: ({ configApi, discoveryApi }) =>
+      new TechDocsDevApi({
+        configApi,
+        discoveryApi,
+      }),
+  })
+  .registerApi({
+    api: catalogApiRef,
+    deps: { configApi: configApiRef, discoveryApi: discoveryApiRef },
+    factory: ({ configApi, discoveryApi }) =>
+      new CatalogDevApi({
+        configApi,
+        discoveryApi,
+      }),
+  })
   .registerPlugin(techdocsPlugin)
+  .addPage({
+    title: 'Demo Docs',
+    element: <TechdocsPage />,
+  })
   .render();

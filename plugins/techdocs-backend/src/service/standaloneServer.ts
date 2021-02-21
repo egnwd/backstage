@@ -17,7 +17,7 @@
 import {
   createServiceBuilder,
   SingleHostDiscovery,
-  UrlReader,
+  UrlReaders,
 } from '@backstage/backend-common';
 import { Server } from 'http';
 import { Logger } from 'winston';
@@ -43,25 +43,27 @@ export async function startStandaloneServer(
 ): Promise<Server> {
   const logger = options.logger.child({ service: 'techdocs-backend' });
   const config = new ConfigReader({
+    backend: {
+      baseUrl: `http://localhost:${options.port}`,
+      listen: {
+        port: options.port,
+      },
+    },
     techdocs: {
       publisher: {
         type: 'local',
       },
     },
   });
+  const reader = UrlReaders.default({ logger, config });
   const discovery = SingleHostDiscovery.fromConfig(config);
-  const mockUrlReader: jest.Mocked<UrlReader> = {
-    read: jest.fn(),
-    readTree: jest.fn(),
-    search: jest.fn(),
-  };
 
   logger.debug('Creating application...');
   const preparers = new Preparers();
   const directoryPreparer = new DirectoryPreparer(
     config,
     logger,
-    mockUrlReader,
+    reader,
   );
   preparers.register('dir', directoryPreparer);
 
